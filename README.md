@@ -4,7 +4,7 @@ Collection of generators for various different graph classes.
 ## Graph classes
 The list below contains all graph classes supported so far. All graphs are simple, which means they have no loops or multi-edges. The parameter *n* stands for number of vertices, *m* for number of edges, *d* for dimension, *p* for a probability, *g/g1/g2* for a graph, *s* for a seed.
 
-- `emptyGraph(n)`
+- `emptyGraph(n)`, the [edgeless graph](https://en.wikipedia.org/wiki/Null_graph#Edgeless_graph) *\bar{K_n}*
 - `path(n)`, the path *P_n*
 - `circle(n)`, the [circle](http://www.graphclasses.org/classes/gc_132.html) *C_n* (not to confuse with a [circle graph](https://en.wikipedia.org/wiki/Circle_graph))
 - `prueferTree(n)`, a (unlabelled) tree based on a random [Prüfer sequence](https://en.wikipedia.org/wiki/Pr%C3%BCfer_sequence)

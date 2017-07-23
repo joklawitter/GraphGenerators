@@ -4,7 +4,6 @@ import java.util.Random;
 
 import model.Edge;
 import model.Graph;
-import model.GraphClass;
 import model.Vertex;
 
 public class GraphOperators {
@@ -22,7 +21,6 @@ public class GraphOperators {
 		}
 
 		Graph shuffledGraph = new Graph(graph.getN(), graph.getM(), graph.isDirected());
-		shuffledGraph.setGraphClass(graph.getGraphClass());
 		shuffledGraph.setName(graph.getName());
 
 		int[] permutation = RandomUtil.randomPermutation(graph.getN());
@@ -52,8 +50,7 @@ public class GraphOperators {
 	 * @param name
 	 * @return copy of given graph thinned out by given probability
 	 */
-	public static Graph thinOutGraph(Graph graph, double probability, Random random,
-			GraphClass graphClass, String name) {
+	public static Graph thinOutGraph(Graph graph, double probability, Random random, String name) {
 		if (graph == null) {
 			throw new IllegalArgumentException();
 		}
@@ -64,7 +61,6 @@ public class GraphOperators {
 			random = RandomUtil.getRandom();
 		}
 		Graph thinGraph = new Graph(graph.getN(), graph.getM(), graph.isDirected());
-		thinGraph.setGraphClass(graph.getGraphClass());
 		thinGraph.setName(graph.getName());
 
 		for (Edge edge : graph.getEdges()) {
@@ -89,12 +85,13 @@ public class GraphOperators {
 	 * @return copy of given graph thinned out by given probability
 	 */
 	public static Graph thinOutGraph(Graph graph, double probability, Random random) {
-		return thinOutGraph(graph, probability, random, graph.getGraphClass(), graph.getName());
+		return thinOutGraph(graph, probability, random, graph.getName());
 	}
 
 	/**
 	 * Creates the Cartesian product of two given graphs. Resulting graph will
-	 * only be directed if both input graphs were directed.
+	 * only be directed if both input graphs were directed. Sets the name of the
+	 * resulting graph to "firstName x secondName".
 	 * 
 	 * @param firstGraph
 	 *            first {@link Graph} of the product
@@ -102,7 +99,7 @@ public class GraphOperators {
 	 *            second {@link Graph} of the product
 	 * @return Cartesian product of the two given graphs
 	 */
-	public static Graph createGraphProduct(Graph firstGraph, Graph secondGraph) {
+	public static Graph createCartesianGraphProduct(Graph firstGraph, Graph secondGraph) {
 		if ((firstGraph == null) || (secondGraph == null)) {
 			throw new IllegalArgumentException();
 		}
@@ -127,6 +124,30 @@ public class GraphOperators {
 				productGraph.addEdge(edge.getStartVertex().getId() * n1 + i,
 						edge.getTargetVertex().getId() * n1 + i);
 			}
+		}
+
+		productGraph.setName(firstGraph.getName() + " \u00D7 " + secondGraph.getName());
+
+		return productGraph;
+	}
+
+	/**
+	 * Creates the Cartesian product of the given graphs in the order given.
+	 * 
+	 * @param graphs
+	 *            the graphs to which Cartesian products gets applied to
+	 * @return Cartesian product of the given graphs
+	 */
+	public static Graph createCartesianGraphProduct(Graph[] graphs) {
+		if (graphs == null) {
+			throw new IllegalArgumentException("Cannot create Cartesian product of null.");
+		} else if (graphs.length < 2) {
+			throw new IllegalArgumentException("Cartiesian product needs at least two graphs.");
+		}
+
+		Graph productGraph = createCartesianGraphProduct(graphs[0], graphs[1]);
+		for (int i = 2; i < graphs.length; i++) {
+			productGraph = createCartesianGraphProduct(productGraph, graphs[i]);
 		}
 
 		return productGraph;

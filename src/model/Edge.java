@@ -9,6 +9,7 @@ package model;
  */
 public class Edge implements Comparable<Edge> {
 
+	public static final int NON_GRAPH_EDGE_ID = -2;
 	private final int id;
 	private final Vertex start;
 	private final Vertex target;
@@ -26,7 +27,7 @@ public class Edge implements Comparable<Edge> {
 		if ((start == null) || (target == null)) {
 			throw new IllegalArgumentException("Edge can't initialise with null-vertex.");
 		}
-		if (id < 0) {
+		if ((id < 0) && (id != NON_GRAPH_EDGE_ID)) {
 			throw new IllegalArgumentException("Edge can't have negative id.");
 		}
 

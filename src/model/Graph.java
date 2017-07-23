@@ -13,13 +13,15 @@ import algorithms.GraphUtils;
  */
 public class Graph {
 
+	public static final boolean DIRECTED = false;
+	public static final boolean UNDIRECTED = !DIRECTED;
+
 	private final Vertex[] vertices;
 	private List<Edge> edges = new ArrayList<Edge>();
 
 	private final int n;
 	private int m;
 	private int edgeIdCounter = 0;
-	private GraphClass graphClass = GraphClass.UNDEFINED;
 	private String name = null;
 	private final boolean isDirected;
 
@@ -186,27 +188,31 @@ public class Graph {
 	}
 
 	/**
+	 * Returns the {@link Edge} with given end vertices.
+	 * 
+	 * @param firstVertex
+	 *            first end vertex of edge
+	 * @param secondVertex
+	 *            second end vertex of edge
+	 * @return the {@link Edge} with given end vertices, returns null if
+	 *         vertices are not adjacent
+	 */
+	public Edge getEdgeByEndvertices(Vertex firstVertex, Vertex secondVertex) {
+		for (Edge edge : firstVertex.getEdges()) {
+			if (edge.getOtherEnd(firstVertex) == secondVertex) {
+				return edge;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Returns the {@link Edge edges} of this graph.
 	 * 
 	 * @return the {@link Edge edges} of this graph
 	 */
 	public List<Edge> getEdges() {
 		return edges;
-	}
-
-	/**
-	 * @return the graph class of this graph
-	 */
-	public GraphClass getGraphClass() {
-		return graphClass;
-	}
-
-	/**
-	 * @param newGraphClass
-	 *            new graph class for this graph
-	 */
-	public void setGraphClass(GraphClass newGraphClass) {
-		this.graphClass = newGraphClass;
 	}
 
 	/**
@@ -223,16 +229,18 @@ public class Graph {
 	 * @param name
 	 *            new name of the graph
 	 */
-	public void setName(String name) {
+	public Graph setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	@Override
 	public String toString() {
-		String str = "Graph: n = " + n + ", m = " + m + "\n";
+		String str = "Graph";
 		if (name != null) {
-			str += "name = " + name + ", graph class = " + graphClass.name();
+			str += " \"" + name + "\"";
 		}
+		str += ": n = " + n + ", m = " + m + "\n";
 		String vis = "";
 		for (Vertex vertex : vertices) {
 			vis += vertex.toString() + "\n";
@@ -253,7 +261,6 @@ public class Graph {
 			copy.addEdge(edge.getStartVertex().getId(), edge.getTargetVertex().getId());
 		}
 
-		copy.setGraphClass(this.graphClass);
 		copy.setName(this.name);
 		return copy;
 	}

@@ -13,7 +13,7 @@ import algorithms.GraphUtils;
  */
 public class Graph {
 
-	public static final boolean DIRECTED = false;
+	public static final boolean DIRECTED = true;
 	public static final boolean UNDIRECTED = !DIRECTED;
 
 	private final Vertex[] vertices;

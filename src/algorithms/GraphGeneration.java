@@ -47,8 +47,10 @@ public class GraphGeneration {
 
 		Graph pathGraph = new Graph(length, length, Graph.UNDIRECTED);
 		pathGraph.setName("P_{" + length + "}");
-		for (int i = 0; i < length - 1; i++) {
-			pathGraph.addEdge(i, i + 1);
+		if (length > 1) {
+			for (int i = 0; i < length - 1; i++) {
+				pathGraph.addEdge(i, i + 1);
+			}
 		}
 		return pathGraph;
 
@@ -81,6 +83,70 @@ public class GraphGeneration {
 	}
 
 	/**
+	 * Creates a random tree by converting a randomly generated <a
+	 * href=https://en.wikipedia.org/wiki/Pr%C3%BCfer_sequence>Pruefer
+	 * sequence </a> into a tree.
+	 * 
+	 * @param numVertices
+	 *            the number of vertices
+	 * @param seed
+	 *            for randomness
+	 * @return a random tree generated with Pruefer sequence
+	 */
+	public static Graph createPrueferTree(int numVertices, int seed) {
+		if (numVertices < 0) {
+			throw new IllegalArgumentException("Graph can't have negative number of vertices");
+		}
+
+		Graph tree = new Graph(numVertices, Integer.max(numVertices - 1, 0), Graph.UNDIRECTED);
+		tree.setName("PrueferTree_{" + numVertices + ", seed " + seed + "}");
+
+		Random random = new Random(seed);
+		// generate pruefer sequence
+		int[] prueferSequence = RandomUtil.randomPermutation(numVertices - 2, random);
+
+		// set degrees
+		int[] degrees = new int[numVertices];
+		for (int i = 0; i < degrees.length; i++) {
+			degrees[i] = 1;
+		}
+		for (int i = 0; i < prueferSequence.length; i++) {
+			degrees[prueferSequence[i]]++;
+		}
+
+		// add edges
+		for (int i = 0; i < prueferSequence.length; i++) {
+			for (int j = 0; j < degrees.length; j++) {
+				if (degrees[j] == 1) {
+					tree.addEdge(j, prueferSequence[i]);
+					degrees[j]--;
+					degrees[prueferSequence[i]]--;
+					break;
+				}
+			}
+		}
+
+		// add last edge
+		int u = -1;
+		int v = -1;
+		for (int i = 0; i < degrees.length; i++) {
+			if (degrees[i] == 1) {
+				if (u < 0) {
+					// found first vertex
+					u = i;
+				} else {
+					// found second vertex
+					v = i;
+					break;
+				}
+			}
+		}
+		tree.addEdge(u, v);
+
+		return tree;
+	}
+
+	/**
 	 * Creates a
 	 * <a href = "https://en.wikipedia.org/wiki/Star_(graph_theory)">star</a>
 	 * with given number of vertices.
@@ -109,16 +175,29 @@ public class GraphGeneration {
 	 * 
 	 * @param numVertices
 	 *            number of vertices the new graph will have
+	 * @return a random maximal outerplanar graph
+	 */
+	public static Graph createMaxOuterplanarGraph(int numVertices) {
+		return createMaxOuterplanarGraph(numVertices, RandomUtil.getRandom().nextInt());
+	}
+
+	/**
+	 * Creates a random maximal
+	 * <a href = "https://en.wikipedia.org/wiki/Outerplanar_graph">outerplanar
+	 * graph</a> with given number of vertices.
+	 * 
+	 * @param numVertices
+	 *            number of vertices the new graph will have
 	 * @param seed
 	 *            seed for randomness
-	 * @return
+	 * @return a random maximal outerplanar graph
 	 */
 	public static Graph createMaxOuterplanarGraph(int numVertices, int seed) {
 		if (numVertices < 0) {
 			throw new IllegalArgumentException("Graph can't have negative number of vertices");
 		}
 
-		int numEdges = 2 * numVertices - 3;
+		int numEdges = Integer.max(0, 2 * numVertices - 3);
 		Graph maxOuterplanarGraph = new Graph(numVertices, numEdges, Graph.UNDIRECTED);
 		maxOuterplanarGraph.setName("MaxOuterplanar_{" + numVertices + "," + seed + "}");
 
@@ -267,6 +346,7 @@ public class GraphGeneration {
 		Graph hamiltonianPlanarGraph = new Graph(numVertices, 3 * numVertices - 6,
 				Graph.UNDIRECTED);
 		hamiltonianPlanarGraph.setName("hamiltonianMaxPlanar(" + numVertices + ", " + seed + ")");
+		ArrayList<Edge> newDualEdges = new ArrayList<Edge>(numVertices / 2);
 
 		// merge outerplanar graphs
 		for (int i = 0; i < numVertices; i++) {
@@ -285,12 +365,19 @@ public class GraphGeneration {
 
 			// B. add edges of g2
 			Vertex currentOfSecondGraph = secondOuterplanarGraph.getVertexById(i);
-			for (Vertex neighbour : currentOfSecondGraph.getNeighbors()) {
+			neighborsLoop: for (Vertex neighbour : currentOfSecondGraph.getNeighbors()) {
 				// special case edge from first to last vertex
 				if ((i == 0) && (neighbour.getId() == numVertices - 1)) {
 					continue;
 				} else if (neighbour.getId() > i + 1) {
 					int neighbourId = neighbour.getId();
+
+					for (Edge e : newDualEdges) {
+						if (e.getStartVertex().getId() == i
+								&& e.getTargetVertex().getId() == neighbour.getId()) {
+							continue neighborsLoop;
+						}
+					}
 
 					if (!usedNeighbours.contains(neighbourId)) {
 						// edge is not contained in g1
@@ -301,12 +388,9 @@ public class GraphGeneration {
 								neighbour);
 						// method findDualEdge adds edge also to the
 						// secondOuterplanarGraph
-						// we thus only have to add it, if we would have found
-						// it earlier
-						if (dualEdge.getStartVertex().getId() < i) {
-							hamiltonianPlanarGraph.addEdge(dualEdge.getStartVertex().getId(),
-									dualEdge.getTargetVertex().getId());
-						}
+						newDualEdges.add(dualEdge);
+						hamiltonianPlanarGraph.addEdge(dualEdge.getStartVertex().getId(),
+								dualEdge.getTargetVertex().getId());
 					}
 				}
 			}
@@ -393,7 +477,7 @@ public class GraphGeneration {
 	 *            seed for randomness
 	 * @return a random 1-planar graph
 	 */
-	public static Graph create1PlanarGraph(int numVertices, int numFlips, int seed) {
+	public static Graph createMaxOnePlanarGraph(int numVertices, int numFlips, int seed) {
 		if (numVertices < 3) {
 			throw new IllegalArgumentException("1-planar graph should have at least 3 vertices,"
 					+ "but parameter given was " + numVertices + ".");

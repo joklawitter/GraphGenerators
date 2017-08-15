@@ -80,7 +80,7 @@ public class GraphMLWriter {
 			// create graph element and add attributes
 			Element graphElement = document.createElement(GRAPH_TAG);
 			graphElement.setAttribute(ID, GRAPH_ID_VALUE);
-			graphElement.setAttribute(GRAPH_EDGE_DEFAULT, graph.isDirected()
+			graphElement.setAttribute(GRAPH_EDGE_DEFAULT, (graph.isDirected() == Graph.DIRECTED)
 					? GRAPH_EDGE_DEFAULT_DIRECTED : GRAPH_EDGE_DEFAULT_UNDIRECTED);
 			rootElement.appendChild(graphElement);
 			// TODO: define and add graph class as attribute

@@ -38,7 +38,7 @@ public class GraphOperators {
 
 	/**
 	 * Thins out the given graph by only taking edges in the returned graph with
-	 * given probability. New graph has given {@link GraphClass} and name.
+	 * given probability. New graph receives the given name.
 	 * 
 	 * @param graph
 	 *            to be thinned out
@@ -46,7 +46,6 @@ public class GraphOperators {
 	 *            to take edges
 	 * @param random
 	 *            using this random
-	 * @param graphClass
 	 * @param name
 	 * @return copy of given graph thinned out by given probability
 	 */

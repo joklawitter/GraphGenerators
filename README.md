@@ -1,5 +1,5 @@
 # GraphGenerators
-Collection of generators for various different graph classes.
+Collection of generators for various different graph classes. The output format is [GraphML](http://graphml.graphdrawing.org/).
 
 ## Graph classes
 The list below contains all graph classes supported so far. All graphs are simple, which means they have no loops or multi-edges. The parameter *n* stands for number of vertices, *m* for number of edges, *d* for dimension, *p* for a probability, *g/g1/g2* for a graph, *s* for a seed.

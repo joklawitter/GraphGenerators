@@ -25,7 +25,7 @@ public class GraphOperators {
 
 		int[] permutation = RandomUtil.randomPermutation(graph.getN());
 		for (Edge edge : graph.getEdges()) {
-			graph.addEdge(permutation[edge.getStartVertex().getId()],
+			shuffledGraph.addEdge(permutation[edge.getStartVertex().getId()],
 					permutation[edge.getTargetVertex().getId()]);
 		}
 
